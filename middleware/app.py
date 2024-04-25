@@ -163,7 +163,7 @@ async def process_request(request: Request):
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
-    if 'bucket_endpoint_url' in event:
+    if 'bucket_endpoint_url' in event['input']:
         image_data = base64.b64decode(response.json()['images'][0])
         file_name = f"{int(time.time())}_{random.randint(1000, 9999)}.png"
         bucket_name = "output_images"
