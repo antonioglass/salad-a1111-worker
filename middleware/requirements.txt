@@ -1,0 +1,5 @@
+fastapi==0.110.2
+pydantic==2.5.2
+runpod==1.6.2
+uvicorn==0.15.0
+requests==2.31.0
