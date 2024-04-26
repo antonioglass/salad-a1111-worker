@@ -168,7 +168,7 @@ async def process_request(request: Request):
         file_name = f"{int(time.time())}_{random.randint(1000, 9999)}.png"
         bucket_name = "output_images"
         bucket_creds = {
-            "endpointUrl": event['bucket_endpoint_url'],
+            "endpointUrl": event['input']['bucket_endpoint_url'],
             "accessId": os.environ.get('BUCKET_ACCESS_KEY_ID'),
             "accessSecret": os.environ.get('BUCKET_SECRET_ACCESS_KEY')
         }
