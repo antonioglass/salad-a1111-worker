@@ -71,9 +71,9 @@ RUN mkdir -p /logs
 # Install config files
 RUN cd /stable-diffusion-webui && \
     rm -f webui-user.sh config.json ui-config.json && \
-    wget https://raw.githubusercontent.com/antonioglass/runpod-worker-a1111/main/webui-user.sh && \
-    wget https://raw.githubusercontent.com/antonioglass/runpod-worker-a1111/main/config.json && \
-    wget https://raw.githubusercontent.com/antonioglass/runpod-worker-a1111/main/ui-config.json
+    wget https://raw.githubusercontent.com/antonioglass/salad-worker-a1111/main/webui-user.sh && \
+    wget https://raw.githubusercontent.com/antonioglass/salad-worker-a1111/main/config.json && \
+    wget https://raw.githubusercontent.com/antonioglass/salad-worker-a1111/main/ui-config.json
 
 
 # Prepare the middleware
