@@ -2,6 +2,11 @@
 
 echo "Worker Initiated"
 
+if [ -z "$HF_TOKEN" ]; then
+    echo "Error: HF_TOKEN is not set."
+    exit 1
+fi
+
 # Define model storage directories
 STABLE_DIFFUSION_MODEL_DIR="/stable-diffusion-webui/models/Stable-diffusion"
 EMBEDDINGS_MODEL_DIR="/stable-diffusion-webui/embeddings"
