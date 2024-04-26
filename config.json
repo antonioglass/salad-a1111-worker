@@ -76,7 +76,7 @@
     "training_enable_tensorboard": false,
     "training_tensorboard_save_images": false,
     "training_tensorboard_flush_every": 120,
-    "sd_model_checkpoint": "deliberate_v2.safetensors [9aba26abdf]",
+    "sd_model_checkpoint": "epicphotogasm_y.safetensors",
     "sd_checkpoint_cache": 0,
     "sd_vae_checkpoint_cache": 0,
     "sd_vae": "Automatic",
