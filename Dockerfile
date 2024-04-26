@@ -60,10 +60,43 @@ RUN source /venv/bin/activate && \
     python -m install-automatic --skip-torch-cuda-test && \
     deactivate
 
-# Download Stable Diffusion models
-RUN mkdir -p /stable-diffusion-webui/models/Stable-diffusion && \
-    cd /stable-diffusion-webui/models/Stable-diffusion && \
-    wget https://huggingface.co/antonioglass/models/resolve/main/3dAnimationDiffusion_v10.safetensors
+# Cloning ControlNet extension repo
+RUN git clone --depth=1 https://github.com/Mikubill/sd-webui-controlnet.git extensions/sd-webui-controlnet
+
+# Cloning the ReActor extension repo
+RUN git clone --depth=1 https://github.com/Gourieff/sd-webui-reactor.git extensions/sd-webui-reactor
+
+# Installing dependencies for ControlNet
+WORKDIR /stable-diffusion-webui/extensions/sd-webui-controlnet
+RUN source /venv/bin/activate && \
+    pip3 install -r requirements.txt && \
+    deactivate
+
+# Installing dependencies for ReActor
+WORKDIR /stable-diffusion-webui/extensions/sd-webui-reactor
+RUN source /venv/bin/activate && \
+    pip3 install protobuf==3.20.3 && \
+    pip3 install -r requirements.txt && \
+    pip3 install onnxruntime-gpu==1.16.3 && \
+    deactivate
+
+# Configuring ReActor to use the GPU instead of CPU
+RUN echo "CUDA" > last_device.txt
+
+# Installing the model for ReActor
+WORKDIR /stable-diffusion-webui/models/insightface
+RUN wget https://huggingface.co/antonioglass/reactor/resolve/main/inswapper_128.onnx
+
+# Download ControlNet models
+WORKDIR /stable-diffusion-webui/models/ControlNet
+RUN wget https://huggingface.co/antonioglass/controlnet/resolve/main/controlnet11Models_openpose.safetensors && \
+    wget https://huggingface.co/antonioglass/controlnet/raw/main/controlnet11Models_openpose.yaml
+
+# Download Upscalers
+WORKDIR /stable-diffusion-webui/models/ESRGAN
+RUN wget https://huggingface.co/antonioglass/upscalers/resolve/main/4x-AnimeSharp.pth && \
+    wget https://huggingface.co/antonioglass/upscalers/resolve/main/4x_NMKD-Siax_200k.pth && \
+    wget https://huggingface.co/antonioglass/upscalers/resolve/main/8x_NMKD-Superscale_150000_G.pth
 
 # Create log directory
 RUN mkdir -p /logs
