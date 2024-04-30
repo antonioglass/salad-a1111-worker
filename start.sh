@@ -24,7 +24,7 @@ download_model() {
     local model_path="$model_dir/$(basename $model_url)"
     if [ ! -f "$model_path" ]; then
         echo "Downloading model from $model_url to $model_dir using HF_TOKEN"
-        wget --header="Authorization: Bearer $HF_TOKEN" -P "$model_dir" "$model_url"
+        wget --header="Authorization: Bearer $HF_TOKEN" -P "$model_dir" "$model_url" &
     else
         echo "Model already exists: $(basename $model_path)"
     fi
@@ -81,16 +81,19 @@ lora_urls=(
 for url in "${stable_diffusion_urls[@]}"; do
     download_model "$url" "$STABLE_DIFFUSION_MODEL_DIR"
 done
+wait
 
 # Download embeddings models
 for url in "${embeddings_urls[@]}"; do
     download_model "$url" "$EMBEDDINGS_MODEL_DIR"
 done
+wait
 
 # Download LoRa models
 for url in "${lora_urls[@]}"; do
     download_model "$url" "$LORAS_MODEL_DIR"
 done
+wait
 
 echo "Starting WebUI API"
 source /venv/bin/activate
