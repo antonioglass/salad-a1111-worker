@@ -41,6 +41,7 @@ stable_diffusion_urls=(
     "https://huggingface.co/antonioglass/models/resolve/main/dreamshaper_631Inpainting.safetensors"
     "https://huggingface.co/antonioglass/models/resolve/main/epicphotogasm_z-inpainting.safetensors"
     "https://huggingface.co/antonioglass/models/resolve/main/meinahentai_v4-inpainting.safetensors"
+    "https://huggingface.co/antonioglass/models/resolve/main/Anime_v2.safetensors"
 )
 
 # List of embeddings model URLs
