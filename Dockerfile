@@ -98,7 +98,16 @@ RUN wget https://huggingface.co/antonioglass/upscalers/resolve/main/4x-AnimeShar
     wget https://huggingface.co/antonioglass/upscalers/resolve/main/4x_NMKD-Siax_200k.pth && \
     wget https://huggingface.co/antonioglass/upscalers/resolve/main/8x_NMKD-Superscale_150000_G.pth
 
+# Download Stable Diffusion models
+WORKDIR /stable-diffusion-webui/models/Stable-diffusion
+RUN wget https://huggingface.co/antonioglass/models/resolve/main/3dAnimationDiffusion_v10.safetensors && \
+    wget https://huggingface.co/antonioglass/models/resolve/main/epicphotogasm_y.safetensors && \
+    wget https://huggingface.co/antonioglass/models/resolve/main/general_v3.safetensors && \
+    wget https://huggingface.co/antonioglass/models/resolve/main/meinahentai_v4.safetensors && \
+    wget https://huggingface.co/antonioglass/models/resolve/main/semi-realistic_v6.safetensors
+
 # Create log directory
+WORKDIR /
 RUN mkdir -p /logs
 
 # Install config files

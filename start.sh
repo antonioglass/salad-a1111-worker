@@ -32,11 +32,6 @@ download_model() {
 
 # List of Stable Diffusion model URLs
 stable_diffusion_urls=(
-    "https://huggingface.co/antonioglass/models/resolve/main/3dAnimationDiffusion_v10.safetensors"
-    "https://huggingface.co/antonioglass/models/resolve/main/epicphotogasm_y.safetensors"
-    "https://huggingface.co/antonioglass/models/resolve/main/general_v3.safetensors"
-    "https://huggingface.co/antonioglass/models/resolve/main/meinahentai_v4.safetensors"
-    "https://huggingface.co/antonioglass/models/resolve/main/semi-realistic_v6.safetensors"
     "https://huggingface.co/antonioglass/models/resolve/main/Deliberate_v3-inpainting.safetensors"
     "https://huggingface.co/antonioglass/models/resolve/main/dreamshaper_631Inpainting.safetensors"
     "https://huggingface.co/antonioglass/models/resolve/main/epicphotogasm_z-inpainting.safetensors"
