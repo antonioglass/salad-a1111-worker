@@ -28,23 +28,43 @@ session.mount('http://', HTTPAdapter(max_retries=retries))
 #                              Automatic Functions                             #
 # ---------------------------------------------------------------------------- #
 
-def wait_for_service(url):
+def wait_for_service():
     retries = 0
 
     while True:
         try:
-            requests.get(url)
+            payload = {
+                "prompt": "a cat",
+                "negative_prompt": "",
+                "seed": -1,
+                "batch_size": 1,
+                "steps": 22,
+                "cfg_scale": 7,
+                "width": 512,
+                "height": 768,
+                "sampler_name": "DPM++ 2M Karras",
+                "sampler_index": "DPM++ 2M Karras",
+                "restore_faces": False,
+                "enable_hr": False,
+                "override_settings": {
+                    "sd_model_checkpoint": "epicphotogasm_y",
+                    "enable_pnginfo": False
+            }
+            }
+            requests.post(
+                url=f'{BASE_URL}/sdapi/v1/txt2img',
+                json=payload,
+                timeout=20
+            )
             return
         except requests.exceptions.RequestException:
             retries += 1
 
-            # Only log every 15 retries so the logs don't get spammed
-            if retries % 15 == 0:
-                print('Service not ready yet. Retrying...')
+            print('Service not ready yet. Retrying...')
         except Exception as err:
             print(f'Error: {err}')
 
-        time.sleep(0.2)
+        time.sleep(10)
 
 
 def send_get_request(endpoint):
@@ -175,6 +195,6 @@ async def process_request(request: Request):
     return response.json()
 
 if __name__ == "__main__":
-    wait_for_service(url='http://127.0.0.1:3000/sdapi/v1/sd-models')
+    wait_for_service()
     print('Automatic1111 API is ready')
     uvicorn.run("app:app", host="::", port=80, log_level="error")
