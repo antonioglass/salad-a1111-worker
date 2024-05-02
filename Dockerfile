@@ -63,43 +63,11 @@ RUN source /venv/bin/activate && \
 # Cloning ControlNet extension repo
 RUN git clone --depth=1 https://github.com/Mikubill/sd-webui-controlnet.git extensions/sd-webui-controlnet
 
-# Cloning the ReActor extension repo
-RUN git clone --depth=1 https://github.com/Gourieff/sd-webui-reactor.git extensions/sd-webui-reactor
-
 # Installing dependencies for ControlNet
 WORKDIR /stable-diffusion-webui/extensions/sd-webui-controlnet
 RUN source /venv/bin/activate && \
     pip3 install -r requirements.txt && \
     deactivate
-
-# Installing dependencies for ReActor
-WORKDIR /stable-diffusion-webui/extensions/sd-webui-reactor
-RUN source /venv/bin/activate && \
-    pip3 install protobuf==3.20.3 && \
-    pip3 install -r requirements.txt && \
-    pip3 install onnxruntime-gpu==1.16.3 && \
-    deactivate
-
-# Configuring ReActor to use the GPU instead of CPU
-RUN echo "CUDA" > last_device.txt
-
-# Installing the models for ReActor
-WORKDIR /stable-diffusion-webui/models/insightface
-RUN wget https://huggingface.co/antonioglass/reactor/resolve/main/inswapper_128.onnx
-
-WORKDIR /stable-diffusion-webui/models/insightface/models/buffalo_l
-RUN wget https://huggingface.co/antonioglass/reactor/resolve/main/buffalo_l/1k3d68.onnx && \
-    wget https://huggingface.co/antonioglass/reactor/resolve/main/buffalo_l/2d106det.onnx && \
-    wget https://huggingface.co/antonioglass/reactor/resolve/main/buffalo_l/det_10g.onnx && \
-    wget https://huggingface.co/antonioglass/reactor/resolve/main/buffalo_l/genderage.onnx && \
-    wget https://huggingface.co/antonioglass/reactor/resolve/main/buffalo_l/w600k_r50.onnx
-
-# Installing Codeformer
-WORKDIR /stable-diffusion-webui/models/Codeformer
-RUN wget https://huggingface.co/antonioglass/reactor/resolve/main/codeformer-v0.1.0.pth
-WORKDIR /stable-diffusion-webui/repositories/CodeFormer/weights/facelib
-RUN wget https://huggingface.co/antonioglass/reactor/resolve/main/detection_Resnet50_Final.pth && \
-    wget https://huggingface.co/antonioglass/reactor/resolve/main/parsing_parsenet.pth
 
 # Download ControlNet models
 WORKDIR /stable-diffusion-webui/models/ControlNet

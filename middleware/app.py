@@ -134,6 +134,7 @@ def process_image_fields(payload):
         payload['mask'] = convert_image_to_base64(payload['mask'])
 
     if 'alwayson_scripts' in payload:
+        # reactor is not included, so can be removed
         if 'reactor' in payload['alwayson_scripts']:
             first_arg = payload['alwayson_scripts']['reactor']['args'][0]
             if is_url(first_arg):
