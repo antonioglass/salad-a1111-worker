@@ -176,9 +176,10 @@ async def process_request(request: Request):
         elif method == 'POST':
             response = send_post_request(endpoint, payload)
     except Exception as e:
+        machine_id = os.environ.get('SALAD_MACHINE_ID', 'Unknown')
         error_trace = traceback.format_exc()
-        print(f'An exception was raised: {e}\n{error_trace}')
-        raise HTTPException(status_code=500, detail=f"An internal server error occurred:\n{error_trace}")
+        print(f'An exception was raised on machine {machine_id}: {e}\n{error_trace}')
+        raise HTTPException(status_code=500, detail=f"An internal server error occurred on machine on machine {machine_id}:\n{error_trace}")
 
     if 'bucket_endpoint_url' in event['input']:
         image_data = base64.b64decode(response.json()['images'][0])
