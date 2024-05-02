@@ -6,8 +6,8 @@ import os
 import random
 import time
 import uvicorn
-from runpod.serverless.utils.rp_validator import validate
-from runpod.serverless.utils.rp_upload import upload_in_memory_object
+from validator import validate
+from upload import upload_in_memory_object
 from requests.adapters import HTTPAdapter, Retry
 from typing import Dict, Any
 from schemas.api import API_SCHEMA
@@ -144,6 +144,18 @@ def process_image_fields(payload):
             if is_url(input_image):
                 payload['alwayson_scripts']['controlnet']['args'][0]['input_image'] = convert_image_to_base64(input_image)
 
+async def upload_and_return(response, endpoint_url):
+    image_data = base64.b64decode(response.json()['images'][0])
+    file_name = f"{int(time.time())}_{random.randint(1000, 9999)}.png"
+    bucket_name = "output_images"
+    bucket_creds = {
+        "endpointUrl": endpoint_url,
+        "accessId": os.environ.get('BUCKET_ACCESS_KEY_ID'),
+        "accessSecret": os.environ.get('BUCKET_SECRET_ACCESS_KEY')
+    }
+    upload_url = await upload_in_memory_object(file_name, image_data, bucket_name=bucket_name, bucket_creds=bucket_creds)
+    return {'image_url': upload_url}
+
 # ---------------------------------------------------------------------------- #
 #                                The Handler                                   #
 # ---------------------------------------------------------------------------- #
@@ -182,18 +194,10 @@ async def process_request(request: Request):
         raise HTTPException(status_code=500, detail=f"An internal server error occurred on machine on machine {machine_id}:\n{error_trace}")
 
     if 'bucket_endpoint_url' in event['input']:
-        image_data = base64.b64decode(response.json()['images'][0])
-        file_name = f"{int(time.time())}_{random.randint(1000, 9999)}.png"
-        bucket_name = "output_images"
-        bucket_creds = {
-            "endpointUrl": event['input']['bucket_endpoint_url'],
-            "accessId": os.environ.get('BUCKET_ACCESS_KEY_ID'),
-            "accessSecret": os.environ.get('BUCKET_SECRET_ACCESS_KEY')
-        }
-        upload_url = upload_in_memory_object(file_name, image_data, bucket_name=bucket_name, bucket_creds=bucket_creds)
-        return {'image_url': upload_url}
-
-    return response.json()
+        endpoint_url = event['input']['bucket_endpoint_url']
+        return await upload_and_return(response, endpoint_url)
+    else:
+        return response.json()
 
 if __name__ == "__main__":
     wait_for_service()
