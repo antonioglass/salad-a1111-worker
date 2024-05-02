@@ -1,4 +1,5 @@
 from fastapi import FastAPI, HTTPException, Request
+import traceback
 import requests
 import base64
 import os
@@ -127,12 +128,6 @@ def process_image_fields(payload):
 #                                The Handler                                   #
 # ---------------------------------------------------------------------------- #
 
-# @app.on_event("startup")
-# async def startup_event():
-#     wait_for_service(url='http://127.0.0.1:3000/sdapi/v1/sd-models')
-#     print('Automatic1111 API is ready', 'INFO')
-#     print('Starting RunPod Serverless...', 'INFO')
-
 @app.post("/api")
 async def process_request(request: Request):
     event = await request.json()
@@ -161,7 +156,9 @@ async def process_request(request: Request):
         elif method == 'POST':
             response = send_post_request(endpoint, payload)
     except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
+        error_trace = traceback.format_exc()
+        print(f'An exception was raised: {e}\n{error_trace}')
+        raise HTTPException(status_code=500, detail=f"An internal server error occurred:\n{error_trace}")
 
     if 'bucket_endpoint_url' in event['input']:
         image_data = base64.b64decode(response.json()['images'][0])
