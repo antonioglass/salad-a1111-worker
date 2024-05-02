@@ -49,7 +49,7 @@ def wait_for_service():
                 "override_settings": {
                     "sd_model_checkpoint": "epicphotogasm_y",
                     "enable_pnginfo": False
-            }
+                }
             }
             requests.post(
                 url=f'{BASE_URL}/sdapi/v1/txt2img',
