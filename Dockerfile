@@ -63,8 +63,17 @@ RUN source /venv/bin/activate && \
 # Cloning ControlNet extension repo
 RUN git clone --depth=1 https://github.com/Mikubill/sd-webui-controlnet.git extensions/sd-webui-controlnet
 
+# Cloning a person mask generator extension repo
+RUN git clone --depth=1 https://github.com/djbielejeski/a-person-mask-generator.git extensions/a-person-mask-generator
+
 # Installing dependencies for ControlNet
 WORKDIR /stable-diffusion-webui/extensions/sd-webui-controlnet
+RUN source /venv/bin/activate && \
+    pip3 install -r requirements.txt && \
+    deactivate
+
+# Installing dependencies for a person mask generator
+WORKDIR /stable-diffusion-webui/extensions/a-person-mask-generator
 RUN source /venv/bin/activate && \
     pip3 install -r requirements.txt && \
     deactivate
@@ -73,6 +82,10 @@ RUN source /venv/bin/activate && \
 WORKDIR /stable-diffusion-webui/models/ControlNet
 RUN wget https://huggingface.co/antonioglass/controlnet/resolve/main/controlnet11Models_openpose.safetensors && \
     wget https://huggingface.co/antonioglass/controlnet/raw/main/controlnet11Models_openpose.yaml
+
+# Download a person mask generator model
+WORKDIR /stable-diffusion-webui/models/ControlNet
+RUN wget https://storage.googleapis.com/mediapipe-models/image_segmenter/selfie_multiclass_256x256/float32/latest/selfie_multiclass_256x256.tflite
 
 # Download Upscalers
 WORKDIR /stable-diffusion-webui/models/ESRGAN
