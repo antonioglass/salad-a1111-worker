@@ -19,10 +19,12 @@ app = FastAPI()
 
 BASE_URL = 'http://127.0.0.1:3000'
 TIMEOUT = 60
+POST_RETRIES = 3
 
 session = requests.Session()
 retries = Retry(total=10, backoff_factor=0.1, status_forcelist=[502, 503, 504])
 session.mount('http://', HTTPAdapter(max_retries=retries))
+machine_id = os.environ.get('SALAD_MACHINE_ID', 'Unknown')
 
 # ---------------------------------------------------------------------------- #
 #                              Automatic Functions                             #
@@ -60,9 +62,9 @@ def wait_for_service():
         except requests.exceptions.RequestException:
             retries += 1
 
-            print('Service not ready yet. Retrying...')
+            print('LOG: Service not ready yet. Retrying...')
         except Exception as err:
-            print(f'Error: {err}')
+            print(f'ERROR: {err}')
 
         time.sleep(10)
 
@@ -74,12 +76,22 @@ def send_get_request(endpoint):
     )
 
 
-def send_post_request(endpoint, payload):
-    return session.post(
+def send_post_request(endpoint, payload, retry=0):
+    response = session.post(
         url=f'{BASE_URL}/{endpoint}',
         json=payload,
         timeout=TIMEOUT
     )
+
+    # Retry the post request in case the model has not completed loading yet
+    if response.status_code == 404:
+        if retry < POST_RETRIES:
+            retry += 1
+            print(f'WARNING: Received HTTP 404 from endpoint: {endpoint}. Retrying: {retry}', job_id)
+            time.sleep(0.2)
+            send_post_request(endpoint, payload, retry)
+
+    return response
 
 
 def validate_api(event):
@@ -171,36 +183,44 @@ async def process_request(request: Request):
 
     endpoint, method, validated_input = validate_payload(event)
 
-    if 'errors' in validated_input:
-        raise HTTPException(status_code=400, detail=validated_input['errors'])
+    if 'errors' in validated_payload:
+        raise HTTPException(status_code=400, detail=validated_payload['errors'])
 
-    if 'validated_input' in validated_input:
-        payload = validated_input['validated_input']
+    if 'validated_input' in validated_payload:
+        payload = validated_payload['validated_input']
     else:
         payload = validated_input
 
     process_image_fields(payload)
 
     try:
-        print(f'Sending {method} request to: /{endpoint}')
+        print(f'LOG: Sending {method} request to: /{endpoint}')
 
         if method == 'GET':
             response = send_get_request(endpoint)
         elif method == 'POST':
             response = send_post_request(endpoint, payload)
-    except Exception as e:
-        machine_id = os.environ.get('SALAD_MACHINE_ID', 'Unknown')
-        error_trace = traceback.format_exc()
-        print(f'An exception was raised on machine {machine_id}: {e}\n{error_trace}')
-        raise HTTPException(status_code=500, detail=f"An internal server error occurred on machine on machine {machine_id}:\n{error_trace}")
+        
+        if response.status_code == 200:
+            if 'bucket_endpoint_url' in event['input']:
+                endpoint_url = event['input']['bucket_endpoint_url']
+                return await upload_and_return(response, endpoint_url)
+            else:
+                return response.json()
+        else:
+            print(f'ERROR: HTTP Status code: {response.status_code}. Machine ID: {machine_id}')
+            print(f'ERROR: Response: {response.json()}')
 
-    if 'bucket_endpoint_url' in event['input']:
-        endpoint_url = event['input']['bucket_endpoint_url']
-        return await upload_and_return(response, endpoint_url)
-    else:
-        return response.json()
+            return {
+                'error': f'A1111 status code: {response.status_code}',
+                'output': response.json()
+            }
+    except Exception as e:
+        error_trace = traceback.format_exc()
+        print(f'ERROR: An exception was raised on machine {machine_id}: {e}\n{error_trace}')
+        raise HTTPException(status_code=500, detail=f"An internal server error occurred on machine on machine {machine_id}:\n{error_trace}")
 
 if __name__ == "__main__":
     wait_for_service()
-    print('Automatic1111 API is ready')
+    print('LOG: Automatic1111 API is ready')
     uvicorn.run("app:app", host="::", port=80, log_level="error")
