@@ -87,7 +87,7 @@ def send_post_request(endpoint, payload, retry=0):
     if response.status_code == 404:
         if retry < POST_RETRIES:
             retry += 1
-            print(f'WARNING: Received HTTP 404 from endpoint: {endpoint}. Retrying: {retry}', job_id)
+            print(f'WARNING: Received HTTP 404 from endpoint: {endpoint}. Retrying: {retry}')
             time.sleep(0.2)
             return send_post_request(endpoint, payload, retry)
 
