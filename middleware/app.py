@@ -89,7 +89,7 @@ def send_post_request(endpoint, payload, retry=0):
             retry += 1
             print(f'WARNING: Received HTTP 404 from endpoint: {endpoint}. Retrying: {retry}', job_id)
             time.sleep(0.2)
-            send_post_request(endpoint, payload, retry)
+            return send_post_request(endpoint, payload, retry)
 
     return response
 
@@ -202,6 +202,8 @@ def process_request(request: Request):
             response = send_post_request(endpoint, payload)
         
         if response.status_code == 200:
+            if len(response.content) == 0:
+                print(f'ERROR: Received empty response from endpoint: /{endpoint}. Machine ID: {machine_id}')
             return response.json()
         else:
             print(f'ERROR: HTTP Status code: {response.status_code}. Machine ID: {machine_id}')
