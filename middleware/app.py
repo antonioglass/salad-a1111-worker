@@ -189,7 +189,7 @@ async def process_request(request: Request):
     if 'validated_input' in validated_payload:
         payload = validated_payload['validated_input']
     else:
-        payload = validated_input
+        payload = validated_payload
 
     process_image_fields(payload)
 
