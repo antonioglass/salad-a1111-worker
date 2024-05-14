@@ -181,7 +181,7 @@ async def process_request(request: Request):
     if 'errors' in validated_api:
         raise HTTPException(status_code=400, detail=validated_api['errors'])
 
-    endpoint, method, validated_input = validate_payload(event)
+    endpoint, method, validated_payload = validate_payload(event)
 
     if 'errors' in validated_payload:
         raise HTTPException(status_code=400, detail=validated_payload['errors'])
