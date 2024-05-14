@@ -174,8 +174,8 @@ async def upload_and_return(response, endpoint_url):
 # ---------------------------------------------------------------------------- #
 
 @app.post("/api")
-def process_request(request: Request):
-    event = request.get_json()
+async def process_request(request: Request):
+    event = await request.json()
     validated_api = validate_api(event)
 
     if 'errors' in validated_api:
