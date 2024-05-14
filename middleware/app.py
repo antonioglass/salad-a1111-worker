@@ -174,8 +174,8 @@ async def upload_and_return(response, endpoint_url):
 # ---------------------------------------------------------------------------- #
 
 @app.post("/api")
-async def process_request(request: Request):
-    event = await request.json()
+def process_request(request: Request):
+    event = request.get_json()
     validated_api = validate_api(event)
 
     if 'errors' in validated_api:
@@ -202,11 +202,7 @@ async def process_request(request: Request):
             response = send_post_request(endpoint, payload)
         
         if response.status_code == 200:
-            if 'bucket_endpoint_url' in event['input']:
-                endpoint_url = event['input']['bucket_endpoint_url']
-                return await upload_and_return(response, endpoint_url)
-            else:
-                return response.json()
+            return response.json()
         else:
             print(f'ERROR: HTTP Status code: {response.status_code}. Machine ID: {machine_id}')
             print(f'ERROR: Response: {response.json()}')
