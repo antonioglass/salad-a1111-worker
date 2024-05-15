@@ -202,8 +202,6 @@ async def process_request(request: Request):
             response = send_post_request(endpoint, payload)
         
         if response.status_code == 200:
-            if len(response.content) == 0:
-                print(f'ERROR: Received empty response from endpoint: /{endpoint}. Machine ID: {machine_id}')
             return response.json()
         else:
             print(f'ERROR: HTTP Status code: {response.status_code}. Machine ID: {machine_id}')
