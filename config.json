@@ -245,5 +245,7 @@
     "controlnet_show_batch_images_in_ui": false,
     "controlnet_increment_seed_during_batch": false,
     "controlnet_disable_control_type": false,
-    "controlnet_disable_openpose_edit": false
+    "controlnet_disable_openpose_edit": false,
+    "sd_checkpoints_keep_in_cpu": false,
+    "sd_checkpoints_limit": 4
 }
