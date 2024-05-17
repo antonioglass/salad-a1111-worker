@@ -210,6 +210,9 @@ async def process_request(request: Request):
                 'error': f'A1111 status code: {response.status_code}',
                 'output': response.json()
             }
+    except requests.exceptions.ConnectionError as e:
+        print(f"Connection error occurred: {e}")
+        raise HTTPException(status_code=503, detail="Connection error occurred.")
     except Exception as e:
         error_trace = traceback.format_exc()
         print(f'ERROR: An exception was raised on machine {machine_id}: {e}\n{error_trace}')
