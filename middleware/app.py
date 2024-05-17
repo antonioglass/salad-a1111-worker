@@ -211,7 +211,7 @@ async def process_request(request: Request):
                 'output': response.json()
             }
     except requests.exceptions.ConnectionError as e:
-        print(f"Connection error occurred: {e}")
+        print(f"ERROR: Connection error occurred: {e}")
         detail = {
             "message": "Connection error",
             "machine_id": machine_id
