@@ -212,11 +212,21 @@ async def process_request(request: Request):
             }
     except requests.exceptions.ConnectionError as e:
         print(f"ERROR: Connection error occurred: {e}")
-        detail = {
-            "message": "Connection error",
-            "machine_id": machine_id
-        }
-        raise HTTPException(status_code=503, detail=detail)
+        organization_name = os.environ.get('ORGANIZATION_NAME')
+        project_name = os.environ.get('PROJECT_NAME')
+        container_group_name = os.environ.get('CONTAINER_GROUP_NAME')
+        salad_api_key = os.environ.get('SALAD_API_KEY')
+
+        url = f"https://api.salad.com/api/public/organizations/{organization_name}/projects/{project_name}/containers/{container_group_name}/instances/{machine_id}/reallocate"
+        headers = {"Salad-Api-Key": salad_api_key}
+
+        try:
+            reallocate_response = requests.post(url, headers=headers)
+            print(f"Reallocate response status code: {reallocate_response.status_code}")
+        except requests.exceptions.RequestException as req_e:
+            print(f"ERROR: Failed to reallocate after connection error: {req_e}")
+
+        raise HTTPException(status_code=503, detail="Connection error occurred.")
     except Exception as e:
         error_trace = traceback.format_exc()
         print(f'ERROR: An exception was raised on machine {machine_id}: {e}\n{error_trace}')
