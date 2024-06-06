@@ -168,6 +168,19 @@ async def upload_and_return(response, endpoint_url):
     upload_url = await upload_in_memory_object(file_name, image_data, bucket_name=bucket_name, bucket_creds=bucket_creds)
     return {'image_url': upload_url}
 
+def reallocate_machine():
+    organization_name = os.environ.get('ORGANIZATION_NAME')
+    project_name = os.environ.get('PROJECT_NAME')
+    container_group_name = os.environ.get('CONTAINER_GROUP_NAME')
+    salad_api_key = os.environ.get('SALAD_API_KEY')
+    url = f"https://api.salad.com/api/public/organizations/{organization_name}/projects/{project_name}/containers/{container_group_name}/instances/{machine_id}/reallocate"
+    headers = {"Salad-Api-Key": salad_api_key}
+    try:
+        reallocate_response = requests.post(url, headers=headers)
+        print(f"Reallocate response status code: {reallocate_response.status_code}")
+    except requests.exceptions.RequestException as req_e:
+        print(f"ERROR: Failed to reallocate after connection or runtime error: {req_e}")
+
 # ---------------------------------------------------------------------------- #
 #                                The Handler                                   #
 # ---------------------------------------------------------------------------- #
@@ -200,32 +213,23 @@ async def process_request(request: Request):
         elif method == 'POST':
             response = send_post_request(endpoint, payload)
         
+        response_json = response.json()
+
         if response.status_code == 200:
-            return response.json()
+            return response_json
+        elif 'error' in response_json and response_json['error'] == 'RuntimeError':
+            reallocate_machine()
+            raise HTTPException(status_code=503, detail="Runtime error detected, reallocating resources.")
         else:
             print(f'ERROR: HTTP Status code: {response.status_code}. Machine ID: {machine_id}')
-            print(f'ERROR: Response: {response.json()}')
-
+            print(f'ERROR: Response: {response_json}')
             return {
                 'error': f'A1111 status code: {response.status_code}',
-                'output': response.json()
+                'output': response_json
             }
     except requests.exceptions.ConnectionError as e:
         print(f"ERROR: Connection error occurred: {e}")
-        organization_name = os.environ.get('ORGANIZATION_NAME')
-        project_name = os.environ.get('PROJECT_NAME')
-        container_group_name = os.environ.get('CONTAINER_GROUP_NAME')
-        salad_api_key = os.environ.get('SALAD_API_KEY')
-
-        url = f"https://api.salad.com/api/public/organizations/{organization_name}/projects/{project_name}/containers/{container_group_name}/instances/{machine_id}/reallocate"
-        headers = {"Salad-Api-Key": salad_api_key}
-
-        try:
-            reallocate_response = requests.post(url, headers=headers)
-            print(f"Reallocate response status code: {reallocate_response.status_code}")
-        except requests.exceptions.RequestException as req_e:
-            print(f"ERROR: Failed to reallocate after connection error: {req_e}")
-
+        reallocate_machine()
         raise HTTPException(status_code=503, detail="Connection error occurred.")
     except Exception as e:
         error_trace = traceback.format_exc()
