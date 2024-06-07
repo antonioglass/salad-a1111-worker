@@ -119,19 +119,24 @@ RUN wget https://huggingface.co/antonioglass/controlnet/resolve/main/controlnet1
 WORKDIR /stable-diffusion-webui/models/ControlNet
 RUN wget https://storage.googleapis.com/mediapipe-models/image_segmenter/selfie_multiclass_256x256/float32/latest/selfie_multiclass_256x256.tflite
 
-# Download Upscalers
-WORKDIR /stable-diffusion-webui/models/ESRGAN
-RUN wget https://huggingface.co/antonioglass/upscalers/resolve/main/4x-AnimeSharp.pth && \
-    wget https://huggingface.co/antonioglass/upscalers/resolve/main/4x_NMKD-Siax_200k.pth && \
-    wget https://huggingface.co/antonioglass/upscalers/resolve/main/8x_NMKD-Superscale_150000_G.pth
-
 # Download Stable Diffusion models
 WORKDIR /stable-diffusion-webui/models/Stable-diffusion
-RUN wget https://huggingface.co/antonioglass/models/resolve/main/3dAnimationDiffusion_v10.safetensors && \
-    wget https://huggingface.co/antonioglass/models/resolve/main/epicphotogasm_y.safetensors && \
-    wget https://huggingface.co/antonioglass/models/resolve/main/general_v3.safetensors && \
-    wget https://huggingface.co/antonioglass/models/resolve/main/meinahentai_v4.safetensors && \
-    wget https://huggingface.co/antonioglass/models/resolve/main/semi-realistic_v6.safetensors
+RUN wget https://huggingface.co/antonioglass/models/resolve/main/epicphotogasm_y.safetensors && \
+    wget https://huggingface.co/antonioglass/models/resolve/main/semi-realistic_v6.safetensors && \
+    wget https://huggingface.co/antonioglass/models/resolve/main/dreamshaper_631Inpainting.safetensors && \
+    wget https://huggingface.co/antonioglass/models/resolve/main/meinahentai_v4-inpainting.safetensors
+
+# Download embeddings models
+WORKDIR /stable-diffusion-webui/embeddings
+RUN wget https://huggingface.co/antonioglass/embeddings/resolve/main/BadDream.pt && \
+    wget https://huggingface.co/antonioglass/embeddings/resolve/main/FastNegativeV2.pt && \
+    wget https://huggingface.co/antonioglass/embeddings/resolve/main/UnrealisticDream.pt
+
+# Download LoRa models
+WORKDIR /stable-diffusion-webui/models/Lora
+RUN wget https://huggingface.co/antonioglass/loras/resolve/main/hand_in_panties_v0.82.safetensors && \
+    wget https://huggingface.co/antonioglass/loras/resolve/main/jkSmallBreastsLite_V01.safetensors && \
+    wget https://huggingface.co/antonioglass/loras/resolve/main/shirtliftv1.safetensors
 
 # Create log directory
 WORKDIR /
