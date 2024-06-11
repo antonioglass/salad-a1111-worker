@@ -131,7 +131,43 @@ RUN wget https://huggingface.co/antonioglass/models/resolve/main/3dAnimationDiff
     wget https://huggingface.co/antonioglass/models/resolve/main/epicphotogasm_y.safetensors && \
     wget https://huggingface.co/antonioglass/models/resolve/main/general_v3.safetensors && \
     wget https://huggingface.co/antonioglass/models/resolve/main/meinahentai_v4.safetensors && \
-    wget https://huggingface.co/antonioglass/models/resolve/main/semi-realistic_v6.safetensors
+    wget https://huggingface.co/antonioglass/models/resolve/main/semi-realistic_v6.safetensors && \
+    wget https://huggingface.co/antonioglass/models/resolve/main/Deliberate_v3-inpainting.safetensors && \
+    wget https://huggingface.co/antonioglass/models/resolve/main/dreamshaper_631Inpainting.safetensors && \
+    wget https://huggingface.co/antonioglass/models/resolve/main/epicphotogasm_z-inpainting.safetensors && \
+    wget https://huggingface.co/antonioglass/models/resolve/main/meinahentai_v4-inpainting.safetensors && \
+    wget https://huggingface.co/antonioglass/models/resolve/main/Anime_v2.safetensors
+
+# Download embeddings models
+WORKDIR /stable-diffusion-webui/embeddings
+RUN wget https://huggingface.co/antonioglass/embeddings/resolve/main/BadDream.pt && \
+    wget https://huggingface.co/antonioglass/embeddings/resolve/main/FastNegativeV2.pt && \
+    wget https://huggingface.co/antonioglass/embeddings/resolve/main/UnrealisticDream.pt
+
+# Download LoRa models
+WORKDIR /stable-diffusion-webui/models/Lora
+RUN wget https://huggingface.co/antonioglass/loras/resolve/main/EkuneCowgirl.safetensors && \
+    wget https://huggingface.co/antonioglass/loras/resolve/main/EkunePOVFellatioV2.safetensors && \
+    wget https://huggingface.co/antonioglass/loras/resolve/main/EkuneSideDoggy.safetensors && \
+    wget https://huggingface.co/antonioglass/loras/resolve/main/IPV1.safetensors && \
+    wget https://huggingface.co/antonioglass/loras/resolve/main/JackOPoseFront.safetensors && \
+    wget https://huggingface.co/antonioglass/loras/resolve/main/LickingOralLoRA.safetensors && \
+    wget https://huggingface.co/antonioglass/loras/resolve/main/POVAssGrab.safetensors && \
+    wget https://huggingface.co/antonioglass/loras/resolve/main/POVDoggy.safetensors && \
+    wget https://huggingface.co/antonioglass/loras/resolve/main/POVMissionary.safetensors && \
+    wget https://huggingface.co/antonioglass/loras/resolve/main/POVPaizuri.safetensors && \
+    wget https://huggingface.co/antonioglass/loras/resolve/main/POVReverseCowgirl.safetensors && \
+    wget https://huggingface.co/antonioglass/loras/resolve/main/PSCowgirl.safetensors && \
+    wget https://huggingface.co/antonioglass/loras/resolve/main/RSCongress.safetensors && \
+    wget https://huggingface.co/antonioglass/loras/resolve/main/SelfBreastGrab.safetensors && \
+    wget https://huggingface.co/antonioglass/loras/resolve/main/SideFellatio.safetensors && \
+    wget https://huggingface.co/antonioglass/loras/resolve/main/TheMating.safetensors && \
+    wget https://huggingface.co/antonioglass/loras/resolve/main/cuddling_handjob_v0.1b.safetensors && \
+    wget https://huggingface.co/antonioglass/loras/resolve/main/hand_in_panties_v0.82.safetensors && \
+    wget https://huggingface.co/antonioglass/loras/resolve/main/jkSmallBreastsLite_V01.safetensors && \
+    wget https://huggingface.co/antonioglass/loras/resolve/main/masturbation_female.safetensors && \
+    wget https://huggingface.co/antonioglass/loras/resolve/main/shirtliftv1.safetensors && \
+    wget https://huggingface.co/antonioglass/loras/resolve/main/yamato_v2.safetensors
 
 # Create log directory
 WORKDIR /
