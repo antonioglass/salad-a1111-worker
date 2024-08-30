@@ -22,5 +22,8 @@ python /stable-diffusion-webui/webui.py \
   --no-download-sd-model > /logs/webui.log 2>&1 &
 deactivate
 
+echo "Starting The Job Queue Worker"
+/usr/local/bin/salad-http-job-queue-worker &
+
 echo "Starting The Handler"
 python3 -u /middleware/app.py

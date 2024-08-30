@@ -1,0 +1,34 @@
+curl -X POST "https://api.salad.com/api/public/organizations/pornjoy/projects/pornjoy/queues/sd-nds-us-duplicate/jobs" \
+     -H "Content-Type: application/json" \
+     -H "Salad-Api-Key: 45e900ef-61bf-41ab-a969-6cd7eb769372" \
+     -d '{
+    "input": {
+        "input": {
+            "api": {
+                "method": "POST",
+                "endpoint": "/sdapi/v1/txt2img"
+            },
+            "payload": {
+                "prompt": "a cat",
+                "negative_prompt": "",
+                "seed": -1,
+                "batch_size": 1,
+                "steps": 22,
+                "cfg_scale": 7,
+                "width": 512,
+                "height": 768,
+                "sampler_name": "DPM++ 2M Karras",
+                "sampler_index": "DPM++ 2M Karras",
+                "restore_faces": false,
+                "enable_hr": false,
+                "override_settings": {
+                    "sd_model_checkpoint": "epicphotogasm_y",
+                    "enable_pnginfo": false
+                }
+            }
+        }
+    }
+}'
+
+
+curl -X GET "https://api.salad.com/api/public/organizations/pornjoy/projects/pornjoy/queues/sd-nds-us-duplicate/jobs/ec6563ff-c40b-4d20-a742-2544a3040c96" -H "Salad-Api-Key: 45e900ef-61bf-41ab-a969-6cd7eb769372"
