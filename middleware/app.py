@@ -62,7 +62,7 @@ def wait_for_service():
         except requests.exceptions.RequestException:
             retries += 1
 
-            print('LOG: Service not ready yet. Retrying...')
+            print('INFO: Service not ready yet. Retrying...')
         except Exception as err:
             print(f'ERROR: {err}')
 
@@ -181,6 +181,52 @@ def reallocate_machine():
     except requests.exceptions.RequestException as req_e:
         print(f"ERROR: Failed to reallocate after connection or runtime error: {req_e}")
 
+@app.get("/health")
+async def readiness_probe():
+    print("INFO: Checking health...")
+    try:
+        payload = {
+            "prompt": "a cat",
+            "negative_prompt": "",
+            "seed": -1,
+            "batch_size": 1,
+            "steps": 22,
+            "cfg_scale": 7,
+            "width": 512,
+            "height": 768,
+            "sampler_name": "DPM++ 2M Karras",
+            "sampler_index": "DPM++ 2M Karras",
+            "restore_faces": False,
+            "enable_hr": False,
+            "override_settings": {
+                "sd_model_checkpoint": "epicphotogasm_y",
+                "enable_pnginfo": False
+            }
+        }
+
+        response = requests.post(
+            url=f'{BASE_URL}/sdapi/v1/txt2img',
+            json=payload,
+            timeout=20
+        )
+        
+        print(f"INFO: Received response with status code: {response.status_code}")
+
+        if response.status_code == 200:
+            print("INFO: Service is healthy")
+            return {"status": "ready"}
+        else:
+            print(f"WARNING: Health check failed, received status code {response.status_code}.")
+            raise HTTPException(status_code=503, detail="Service not ready")
+    
+    except requests.exceptions.RequestException as e:
+        print(f"ERROR: Connection error occurred: {e}")
+        raise HTTPException(status_code=503, detail="Service not available")
+    except Exception as e:
+        error_trace = traceback.format_exc()
+        print(f'ERROR: An exception occurred: {e}\n{error_trace}')
+        raise HTTPException(status_code=500, detail="Internal server error")
+
 # ---------------------------------------------------------------------------- #
 #                                The Handler                                   #
 # ---------------------------------------------------------------------------- #
@@ -206,7 +252,7 @@ async def process_request(request: Request):
     process_image_fields(payload)
 
     try:
-        print(f'LOG: Sending {method} request to: /{endpoint}')
+        print(f'INFO: Sending {method} request to: /{endpoint}')
 
         if method == 'GET':
             response = send_get_request(endpoint)
@@ -238,5 +284,5 @@ async def process_request(request: Request):
 
 if __name__ == "__main__":
     wait_for_service()
-    print('LOG: Automatic1111 API is ready')
-    uvicorn.run("app:app", host="::", port=80, log_level="error")
+    print('INFO: Automatic1111 API is ready')
+    uvicorn.run("app:app", host="0.0.0.0", port=80, log_level="error")
