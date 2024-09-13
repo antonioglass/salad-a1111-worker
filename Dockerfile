@@ -116,7 +116,7 @@ RUN wget https://huggingface.co/antonioglass/controlnet/resolve/main/controlnet1
     wget https://huggingface.co/antonioglass/controlnet/raw/main/controlnet11Models_openpose.yaml
 
 # Download a person mask generator model
-WORKDIR /stable-diffusion-webui/models/ControlNet
+WORKDIR /stable-diffusion-webui/models/mediapipe
 RUN wget https://storage.googleapis.com/mediapipe-models/image_segmenter/selfie_multiclass_256x256/float32/latest/selfie_multiclass_256x256.tflite
 
 # Download Stable Diffusion models
