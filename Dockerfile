@@ -51,7 +51,7 @@ WORKDIR /stable-diffusion-webui
 RUN python -m venv --system-site-packages /venv && \
     source /venv/bin/activate && \
     pip3 install --no-cache-dir torch==2.0.1+cu118 torchvision torchaudio --index-url https://download.pytorch.org/whl/cu118 && \
-    pip3 install --no-cache-dir xformers==0.0.23.post1 --index-url https://download.pytorch.org/whl/cu118 && \
+    pip3 install --no-cache-dir xformers==0.0.22 && \
     deactivate
 
 # Install A1111 Web UI
@@ -63,8 +63,7 @@ RUN source /venv/bin/activate && \
 
 # Cloning the ReActor extension repo
 RUN git clone --depth=1 https://github.com/Gourieff/sd-webui-reactor.git extensions/sd-webui-reactor && \
-    cd extensions/sd-webui-reactor && \
-    git checkout v0.6.1
+    cd extensions/sd-webui-reactor
 
 # Cloning a person mask generator extension repo
 WORKDIR /stable-diffusion-webui
@@ -134,7 +133,7 @@ COPY webui-user.sh config.json ui-config.json ./stable-diffusion-webui/
 # Prepare the middleware
 WORKDIR /
 COPY middleware /middleware
-RUN pip install -r /middleware/requirements.txt
+RUN pip3 install -r /middleware/requirements.txt
 
 # Add Salad Job Queue Worker
 ADD https://github.com/SaladTechnologies/salad-cloud-job-queue-worker/releases/download/v0.3.0/salad-http-job-queue-worker_x86_64.tar.gz /tmp
