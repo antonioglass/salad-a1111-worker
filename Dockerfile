@@ -20,6 +20,7 @@ RUN apt update && \
       git \
       jq \
       moreutils \
+      bc \
       aria2 \
       wget \
       curl \
@@ -43,14 +44,14 @@ RUN ln -s /usr/bin/python3.10 /usr/bin/python
 RUN rm -rf /stable-diffusion-webui /venv
 
 # Clone the A1111 repo
-RUN git clone --depth=1 https://github.com/antonioglass/stable-diffusion-webui.git
+RUN git clone --depth=1 https://github.com/AUTOMATIC1111/stable-diffusion-webui.git
 
 # Install Python packages
 WORKDIR /stable-diffusion-webui
 RUN python -m venv --system-site-packages /venv && \
     source /venv/bin/activate && \
     pip3 install --no-cache-dir torch==2.0.1+cu118 torchvision torchaudio --index-url https://download.pytorch.org/whl/cu118 && \
-    pip3 install --no-cache-dir xformers==0.0.22 && \
+    pip3 install --no-cache-dir xformers==0.0.23.post1 --index-url https://download.pytorch.org/whl/cu118 && \
     deactivate
 
 # Install A1111 Web UI
@@ -60,27 +61,27 @@ RUN source /venv/bin/activate && \
     python -m install-automatic --skip-torch-cuda-test && \
     deactivate
 
-# Cloning ControlNet extension repo
-RUN git clone --depth=1 https://github.com/Mikubill/sd-webui-controlnet.git extensions/sd-webui-controlnet
-
 # Cloning the ReActor extension repo
-RUN git clone --depth=1 https://github.com/Gourieff/sd-webui-reactor.git extensions/sd-webui-reactor
+RUN git clone --depth=1 https://github.com/Gourieff/sd-webui-reactor.git extensions/sd-webui-reactor && \
+    cd extensions/sd-webui-reactor && \
+    git checkout v0.6.1
 
 # Cloning a person mask generator extension repo
+WORKDIR /stable-diffusion-webui
 RUN git clone --depth=1 https://github.com/djbielejeski/a-person-mask-generator.git extensions/a-person-mask-generator
-
-# Installing dependencies for ControlNet
-WORKDIR /stable-diffusion-webui/extensions/sd-webui-controlnet
-RUN source /venv/bin/activate && \
-    pip3 install -r requirements.txt && \
-    deactivate
 
 # Installing dependencies for ReActor
 WORKDIR /stable-diffusion-webui/extensions/sd-webui-reactor
 RUN source /venv/bin/activate && \
-    pip3 install protobuf==3.20.3 && \
+    pip3 install protobuf==3.20.3 mediapipe==0.10.11 && \
     pip3 install -r requirements.txt && \
     pip3 install onnxruntime-gpu==1.16.3 && \
+    deactivate
+
+# Installing dependencies for a person mask generator
+WORKDIR /stable-diffusion-webui/extensions/a-person-mask-generator
+RUN source /venv/bin/activate && \
+    pip3 install -r requirements.txt && \
     deactivate
 
 # Configuring ReActor to use the GPU instead of CPU
@@ -100,20 +101,11 @@ RUN wget https://huggingface.co/antonioglass/reactor/resolve/main/buffalo_l/1k3d
 # Installing Codeformer
 WORKDIR /stable-diffusion-webui/models/Codeformer
 RUN wget https://huggingface.co/antonioglass/reactor/resolve/main/codeformer-v0.1.0.pth
-WORKDIR /stable-diffusion-webui/repositories/CodeFormer/weights/facelib
+
+# Installing GFPGAN
+WORKDIR /stable-diffusion-webui/models/GFPGAN
 RUN wget https://huggingface.co/antonioglass/reactor/resolve/main/detection_Resnet50_Final.pth && \
     wget https://huggingface.co/antonioglass/reactor/resolve/main/parsing_parsenet.pth
-
-# Installing dependencies for a person mask generator
-WORKDIR /stable-diffusion-webui/extensions/a-person-mask-generator
-RUN source /venv/bin/activate && \
-    pip3 install -r requirements.txt && \
-    deactivate
-
-# Download ControlNet models
-WORKDIR /stable-diffusion-webui/models/ControlNet
-RUN wget https://huggingface.co/antonioglass/controlnet/resolve/main/controlnet11Models_openpose.safetensors && \
-    wget https://huggingface.co/antonioglass/controlnet/raw/main/controlnet11Models_openpose.yaml
 
 # Download a person mask generator model
 WORKDIR /stable-diffusion-webui/models/mediapipe
@@ -121,22 +113,12 @@ RUN wget https://storage.googleapis.com/mediapipe-models/image_segmenter/selfie_
 
 # Download Stable Diffusion models
 WORKDIR /stable-diffusion-webui/models/Stable-diffusion
-RUN wget https://huggingface.co/antonioglass/models/resolve/main/epicphotogasm_y.safetensors && \
-    wget https://huggingface.co/antonioglass/models/resolve/main/semi-realistic_v6.safetensors && \
-    wget https://huggingface.co/antonioglass/models/resolve/main/dreamshaper_631Inpainting.safetensors && \
-    wget https://huggingface.co/antonioglass/models/resolve/main/epicphotogasm_z-inpainting.safetensors
+RUN wget https://huggingface.co/antonioglass/models/resolve/main/cyberrealisticPony_v62.safetensors && \
+    wget https://huggingface.co/antonioglass/models/resolve/main/cyberrealisticPorn_v62_inpainting_vae.inpainting.safetensors
 
-# Download embeddings models
-WORKDIR /stable-diffusion-webui/embeddings
-RUN wget https://huggingface.co/antonioglass/embeddings/resolve/main/BadDream.pt && \
-    wget https://huggingface.co/antonioglass/embeddings/resolve/main/FastNegativeV2.pt && \
-    wget https://huggingface.co/antonioglass/embeddings/resolve/main/UnrealisticDream.pt
-
-# Download LoRa models
-WORKDIR /stable-diffusion-webui/models/Lora
-RUN wget https://huggingface.co/antonioglass/loras/resolve/main/hand_in_panties_v0.82.safetensors && \
-    wget https://huggingface.co/antonioglass/loras/resolve/main/jkSmallBreastsLite_V01.safetensors && \
-    wget https://huggingface.co/antonioglass/loras/resolve/main/shirtliftv1.safetensors
+# Download VAEApprox model
+WORKDIR /stable-diffusion-webui/models/VAE-approx
+RUN wget https://huggingface.co/antonioglass/models/resolve/main/vaeapprox-sdxl.pt
 
 # Create log directory
 WORKDIR /
@@ -144,16 +126,20 @@ RUN mkdir -p /logs
 
 # Install config files
 RUN cd /stable-diffusion-webui && \
-    rm -f webui-user.sh config.json ui-config.json && \
-    wget https://raw.githubusercontent.com/antonioglass/salad-a1111-worker/main/webui-user.sh && \
-    wget https://raw.githubusercontent.com/antonioglass/salad-a1111-worker/main/config.json && \
-    wget https://raw.githubusercontent.com/antonioglass/salad-a1111-worker/main/ui-config.json
+    rm -f webui-user.sh config.json ui-config.json
 
+WORKDIR /
+COPY webui-user.sh config.json ui-config.json ./stable-diffusion-webui/
 
 # Prepare the middleware
 WORKDIR /
 COPY middleware /middleware
 RUN pip install -r /middleware/requirements.txt
+
+# Add Salad Job Queue Worker
+ADD https://github.com/SaladTechnologies/salad-cloud-job-queue-worker/releases/download/v0.3.0/salad-http-job-queue-worker_x86_64.tar.gz /tmp
+RUN tar -C /usr/local/bin -zxpf /tmp/salad-http-job-queue-worker_x86_64.tar.gz && \
+    rm -rf /tmp/salad-http-job-queue-worker_x86_64.tar.gz
 
 # Set permissions for scripts
 COPY start.sh /start.sh
